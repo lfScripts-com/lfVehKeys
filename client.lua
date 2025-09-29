@@ -102,8 +102,22 @@ function OpenCloseVehicle()
     end
 end
 
-RegisterKeyMapping('lockcar', Lang.keymapLabel, 'keyboard', (Config and Config.LockKey) or 'U')
+if Config and (Config.LockKeyEnabled == nil or Config.LockKeyEnabled == true) then
+    RegisterKeyMapping('lockcar', Lang.keymapLabel, 'keyboard', (Config and Config.LockKey) or 'U')
+    RegisterCommand('lockcar', function()
+        OpenCloseVehicle()
+    end)
+end
 
-RegisterCommand('lockcar', function()
-    OpenCloseVehicle()
-end)
+if Config and Config.ox_target and GetResourceState('ox_target') == 'started' then
+    exports.ox_target:addGlobalVehicle({
+        {
+            name = 'lfvehkeys_toggle',
+            icon = 'fa-solid fa-key',
+            label = Lang.keymapLabel,
+            onSelect = function(data)
+                OpenCloseVehicle()
+            end
+        }
+    })
+end
