@@ -1,3 +1,4 @@
+local ESX = exports.es_extended:getSharedObject()
 function LockVehicle(vehicle)
     RequestAnimDict("anim@mp_player_intmenu@key_fob@")
     while not HasAnimDictLoaded("anim@mp_player_intmenu@key_fob@") do
