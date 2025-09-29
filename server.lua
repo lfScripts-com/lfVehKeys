@@ -49,7 +49,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                                 cb(true)
                                             else
                                                 cb(false)
-                                                xPlayer.showNotification("~r~Vous n'avez pas les clés de ce véhicule.")
+                                                xPlayer.showNotification(Lang.noKeys)
                                             end
                                         end)
                                     end
@@ -63,7 +63,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                         cb(true)
                                     else
                                         cb(false)
-                                        xPlayer.showNotification("~r~Vous n'avez pas les clés de ce véhicule.")
+                                        xPlayer.showNotification(Lang.noKeys)
                                     end
                                 end)
                             end
@@ -77,7 +77,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                 cb(true)
                             else
                                 cb(false)
-                                xPlayer.showNotification("~r~Vous n'avez pas les clés de ce véhicule.")
+                                xPlayer.showNotification(Lang.noKeys)
                             end
                         end)
                     end
@@ -129,8 +129,7 @@ AddEventHandler('vehicle:syncLock', function(netId, lockStatus, isLocking)
     local vehicle = NetworkGetEntityFromNetworkId(netId)
     if vehicle and DoesEntityExist(vehicle) then
         local plate = GetVehicleNumberPlateText(vehicle)
-        
-        -- Vérifier les permissions du joueur
+
         if CheckVehicleKeyPermission(xPlayer, plate) then
             TriggerClientEvent('vehicle:syncLockClient', -1, netId, lockStatus, isLocking)
         end
@@ -148,7 +147,6 @@ AddEventHandler('vehicle:syncDoor', function(netId, doorId, isOpen)
     if vehicle and DoesEntityExist(vehicle) then
         local plate = GetVehicleNumberPlateText(vehicle)
         
-        -- Vérifier les permissions du joueur
         if CheckVehicleKeyPermission(xPlayer, plate) then
             TriggerClientEvent('vehicle:syncDoor', -1, netId, doorId, isOpen)
         end

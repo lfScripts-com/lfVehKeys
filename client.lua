@@ -9,7 +9,7 @@ function LockVehicle(vehicle)
         SetVehicleDoorsLocked(vehicle, 2)
         PlayVehicleDoorCloseSound(vehicle, 1)
         TaskPlayAnim(GetPlayerPed(-1), "anim@mp_player_intmenu@key_fob@", "fob_click", 8.0, 8.0, -1, 48, 1, false, false, false)
-        ESX.ShowNotification("Vous avez ~r~verrouillé~s~ votre véhicule.")
+        ESX.ShowNotification(Lang.locked)
         SetVehicleLights(vehicle, 2)
         Wait(200)
         SetVehicleLights(vehicle, 0)
@@ -22,7 +22,7 @@ function LockVehicle(vehicle)
         SetVehicleDoorsLocked(vehicle, 1)
         PlayVehicleDoorOpenSound(vehicle, 0)
         TaskPlayAnim(GetPlayerPed(-1), "anim@mp_player_intmenu@key_fob@", "fob_click", 8.0, 8.0, -1, 48, 1, false, false, false)
-        ESX.ShowNotification("Vous avez ~g~déverrouillé~s~ votre véhicule.")
+        ESX.ShowNotification(Lang.unlocked)
         SetVehicleLights(vehicle, 2)
         Wait(200)
         SetVehicleLights(vehicle, 0)
@@ -98,11 +98,11 @@ function OpenCloseVehicle()
             end
         end, GetVehicleNumberPlateText(vehicle))
     else
-        ESX.ShowNotification("~r~Il n'y a pas de véhicule près de vous.")
+        ESX.ShowNotification(Lang.noVehicle)
     end
 end
 
-RegisterKeyMapping('lockcar', '% - Clés de véhicule', 'keyboard', 'U')
+RegisterKeyMapping('lockcar', Lang.keymapLabel, 'keyboard', (Config and Config.LockKey) or 'U')
 
 RegisterCommand('lockcar', function()
     OpenCloseVehicle()
