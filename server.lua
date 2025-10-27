@@ -1,3 +1,5 @@
+local ESX = exports.es_extended:getSharedObject()
+
 RegisterNetEvent('addKeyVehicle')
 AddEventHandler('addKeyVehicle', function(target, plate)
     local xTarget = ESX.GetPlayerFromId(target)
@@ -152,3 +154,4 @@ AddEventHandler('vehicle:syncDoor', function(netId, doorId, isOpen)
         end
     end
 end)
+
