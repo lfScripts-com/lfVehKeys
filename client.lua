@@ -1,4 +1,9 @@
-local ESX = exports.es_extended:getSharedObject()
+if Config and Config.ESXMode == 'old' then
+    ESX = ESX or nil
+    TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+else
+    ESX = exports["es_extended"]:getSharedObject()
+end
 function LockVehicle(vehicle)
     RequestAnimDict("anim@mp_player_intmenu@key_fob@")
     while not HasAnimDictLoaded("anim@mp_player_intmenu@key_fob@") do
