@@ -35,58 +35,123 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                 if row_keys[1] ~= nil then
                     cb(true)
                 else
-                    if Config and Config.lfTerritory == true then
-                        MySQL.Async.fetchAll("SELECT cm.id_crew, cm.id_grade, cg.key_vehicle FROM crew_membres cm LEFT JOIN crew_grades cg ON cm.id_grade = cg.id_grade WHERE cm.identifier = @identifier", {
-                            ["@identifier"] = xPlayer.identifier
-                        }, function(row2)
-                            if row2[1] and row2[1].id_crew and row2[1].key_vehicle == 1 then
-                                local IdCrew = row2[1].id_crew
-                                MySQL.Async.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
-                                    ['@plate'] = plaque,
-                                    ['@crew'] = IdCrew
-                                }, function(row3)
-                                    if row3[1] then
-                                        cb(true)
-                                    else
-                                        MySQL.Async.fetchAll("SELECT 1 FROM jobs_vehicles WHERE plate = @plate AND job = @job", {
-                                            ['@plate'] = plaque,
-                                            ['@job'] = xPlayer.job.name
-                                        }, function(row4)
-                                            if row4[1] then
-                                                cb(true)
-                                            else
-                                                cb(false)
-                                                xPlayer.showNotification(Lang.noKeys)
-                                            end
-                                        end)
-                                    end
-                                end)
+                    if Config and Config.lfLocation == true then
+                        MySQL.Async.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
+                            ['@plate'] = plaque,
+                            ['@identifier'] = xPlayer.identifier
+                        }, function(row_location)
+                            if row_location[1] ~= nil then
+                                cb(true)
                             else
-                                MySQL.Async.fetchAll("SELECT 1 FROM jobs_vehicles WHERE plate = @plate AND job = @job", {
-                                    ['@plate'] = plaque,
-                                    ['@job'] = xPlayer.job.name
-                                }, function(row5)
-                                    if row5[1] then
-                                        cb(true)
-                                    else
-                                        cb(false)
-                                        xPlayer.showNotification(Lang.noKeys)
-                                    end
-                                end)
+                                if Config and Config.lfTerritory == true then
+                                    MySQL.Async.fetchAll("SELECT cm.id_crew, cm.id_grade, cg.key_vehicle FROM crew_membres cm LEFT JOIN crew_grades cg ON cm.id_grade = cg.id_grade WHERE cm.identifier = @identifier", {
+                                        ["@identifier"] = xPlayer.identifier
+                                    }, function(row2)
+                                        if row2[1] and row2[1].id_crew and row2[1].key_vehicle == 1 then
+                                            local IdCrew = row2[1].id_crew
+                                            MySQL.Async.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
+                                                ['@plate'] = plaque,
+                                                ['@crew'] = IdCrew
+                                            }, function(row3)
+                                                if row3[1] then
+                                                    cb(true)
+                                                else
+                                                    MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                                        ['@plate'] = plaque,
+                                                        ['@job'] = xPlayer.job.name
+                                                    }, function(row4)
+                                                        if row4[1] then
+                                                            cb(true)
+                                                        else
+                                                            cb(false)
+                                                            xPlayer.showNotification(Lang.noKeys)
+                                                        end
+                                                    end)
+                                                end
+                                            end)
+                                        else
+                                            MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                                ['@plate'] = plaque,
+                                                ['@job'] = xPlayer.job.name
+                                            }, function(row5)
+                                                if row5[1] then
+                                                    cb(true)
+                                                else
+                                                    cb(false)
+                                                    xPlayer.showNotification(Lang.noKeys)
+                                                end
+                                            end)
+                                        end
+                                    end)
+                                else
+                                    MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                        ['@plate'] = plaque,
+                                        ['@job'] = xPlayer.job.name
+                                    }, function(row5)
+                                        if row5[1] then
+                                            cb(true)
+                                        else
+                                            cb(false)
+                                            xPlayer.showNotification(Lang.noKeys)
+                                        end
+                                    end)
+                                end
                             end
                         end)
                     else
-                        MySQL.Async.fetchAll("SELECT 1 FROM jobs_vehicles WHERE plate = @plate AND job = @job", {
-                            ['@plate'] = plaque,
-                            ['@job'] = xPlayer.job.name
-                        }, function(row5)
-                            if row5[1] then
-                                cb(true)
-                            else
-                                cb(false)
-                                xPlayer.showNotification(Lang.noKeys)
-                            end
-                        end)
+                        if Config and Config.lfTerritory == true then
+                            MySQL.Async.fetchAll("SELECT cm.id_crew, cm.id_grade, cg.key_vehicle FROM crew_membres cm LEFT JOIN crew_grades cg ON cm.id_grade = cg.id_grade WHERE cm.identifier = @identifier", {
+                                ["@identifier"] = xPlayer.identifier
+                            }, function(row2)
+                                if row2[1] and row2[1].id_crew and row2[1].key_vehicle == 1 then
+                                    local IdCrew = row2[1].id_crew
+                                    MySQL.Async.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
+                                        ['@plate'] = plaque,
+                                        ['@crew'] = IdCrew
+                                    }, function(row3)
+                                        if row3[1] then
+                                            cb(true)
+                                        else
+                                            MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                                ['@plate'] = plaque,
+                                                ['@job'] = xPlayer.job.name
+                                            }, function(row4)
+                                                if row4[1] then
+                                                    cb(true)
+                                                else
+                                                    cb(false)
+                                                    xPlayer.showNotification(Lang.noKeys)
+                                                end
+                                            end)
+                                        end
+                                    end)
+                                else
+                                    MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                        ['@plate'] = plaque,
+                                        ['@job'] = xPlayer.job.name
+                                    }, function(row5)
+                                        if row5[1] then
+                                            cb(true)
+                                        else
+                                            cb(false)
+                                            xPlayer.showNotification(Lang.noKeys)
+                                        end
+                                    end)
+                                end
+                            end)
+                        else
+                            MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
+                                ['@plate'] = plaque,
+                                ['@job'] = xPlayer.job.name
+                            }, function(row5)
+                                if row5[1] then
+                                    cb(true)
+                                else
+                                    cb(false)
+                                    xPlayer.showNotification(Lang.noKeys)
+                                end
+                            end)
+                        end
                     end
                 end
             end)
@@ -105,6 +170,13 @@ function CheckVehicleKeyPermission(xPlayer, plate)
         ['@identifier'] = xPlayer.identifier
     })
     if directKey[1] then return true end
+    if Config and Config.lfLocation == true then
+        local locationVeh = MySQL.Sync.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
+            ['@plate'] = plate,
+            ['@identifier'] = xPlayer.identifier
+        })
+        if locationVeh[1] then return true end
+    end
     if Config and Config.lfTerritory == true then
         local crew = MySQL.Sync.fetchAll("SELECT cm.id_crew, cm.id_grade, cg.key_vehicle FROM crew_membres cm LEFT JOIN crew_grades cg ON cm.id_grade = cg.id_grade WHERE cm.identifier = @identifier", {
             ["@identifier"] = xPlayer.identifier
@@ -117,7 +189,7 @@ function CheckVehicleKeyPermission(xPlayer, plate)
             if crewVeh[1] then return true end
         end
     end
-    local jobVeh = MySQL.Sync.fetchAll("SELECT 1 FROM jobs_vehicles WHERE plate = @plate AND job = @job", {
+    local jobVeh = MySQL.Sync.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND job = @job", {
         ['@plate'] = plate,
         ['@job'] = xPlayer.job.name
     })
