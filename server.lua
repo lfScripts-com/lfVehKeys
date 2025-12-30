@@ -35,7 +35,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                 if row_keys[1] ~= nil then
                     cb(true)
                 else
-                    if Config and Config.lfLocation == true then
+                    if Config and Config.lfRental == true then
                         MySQL.Async.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
                             ['@plate'] = plaque,
                             ['@identifier'] = xPlayer.identifier
@@ -170,7 +170,7 @@ function CheckVehicleKeyPermission(xPlayer, plate)
         ['@identifier'] = xPlayer.identifier
     })
     if directKey[1] then return true end
-    if Config and Config.lfLocation == true then
+    if Config and Config.lfRental == true then
         local locationVeh = MySQL.Sync.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
             ['@plate'] = plate,
             ['@identifier'] = xPlayer.identifier
