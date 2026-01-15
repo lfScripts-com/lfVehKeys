@@ -5,6 +5,25 @@ else
     ESX = exports["es_extended"]:getSharedObject()
 end
 
+-- Fonction helper pour les notifications côté serveur
+function ShowNotificationToPlayer(xPlayer, message, notifyType, title)
+    notifyType = notifyType or "info"
+    title = title or ""
+    
+    if Config and Config.NotifySystem == 'notify' then
+        -- Utiliser esx_notify avec les types error/success
+        local length = 3000
+        if notifyType == "error" or notifyType == "success" then
+            exports["esx_notify"]:Notify(notifyType, length, message, title, "bottom-left", nil, nil, xPlayer.source)
+        else
+            exports["esx_notify"]:Notify("info", length, message, title, "bottom-left", nil, nil, xPlayer.source)
+        end
+    else
+        -- Utiliser xPlayer.showNotification par défaut
+        xPlayer.showNotification(message)
+    end
+end
+
 RegisterNetEvent('addKeyVehicle')
 AddEventHandler('addKeyVehicle', function(target, plate)
     local xTarget = ESX.GetPlayerFromId(target)
@@ -35,7 +54,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                 if row_keys[1] ~= nil then
                     cb(true)
                 else
-                    if Config and Config.lfRental == true then
+                    if Config and Config.lfLocation == true then
                         MySQL.Async.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
                             ['@plate'] = plaque,
                             ['@identifier'] = xPlayer.identifier
@@ -49,7 +68,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                     }, function(row2)
                                         if row2[1] and row2[1].id_crew and row2[1].key_vehicle == 1 then
                                             local IdCrew = row2[1].id_crew
-                                            MySQL.Async.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
+                                            MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND crew = @crew", {
                                                 ['@plate'] = plaque,
                                                 ['@crew'] = IdCrew
                                             }, function(row3)
@@ -64,7 +83,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                                             cb(true)
                                                         else
                                                             cb(false)
-                                                            xPlayer.showNotification(Lang.noKeys)
+                                                            ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                                         end
                                                     end)
                                                 end
@@ -78,7 +97,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                                     cb(true)
                                                 else
                                                     cb(false)
-                                                    xPlayer.showNotification(Lang.noKeys)
+                                                    ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                                 end
                                             end)
                                         end
@@ -92,7 +111,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                             cb(true)
                                         else
                                             cb(false)
-                                            xPlayer.showNotification(Lang.noKeys)
+                                            ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                         end
                                     end)
                                 end
@@ -105,7 +124,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                             }, function(row2)
                                 if row2[1] and row2[1].id_crew and row2[1].key_vehicle == 1 then
                                     local IdCrew = row2[1].id_crew
-                                    MySQL.Async.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
+                                    MySQL.Async.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND crew = @crew", {
                                         ['@plate'] = plaque,
                                         ['@crew'] = IdCrew
                                     }, function(row3)
@@ -120,7 +139,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                                     cb(true)
                                                 else
                                                     cb(false)
-                                                    xPlayer.showNotification(Lang.noKeys)
+                                                    ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                                 end
                                             end)
                                         end
@@ -134,7 +153,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                             cb(true)
                                         else
                                             cb(false)
-                                            xPlayer.showNotification(Lang.noKeys)
+                                            ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                         end
                                     end)
                                 end
@@ -148,7 +167,7 @@ ESX.RegisterServerCallback('GetKeyVehicle', function(source, cb, plaque)
                                     cb(true)
                                 else
                                     cb(false)
-                                    xPlayer.showNotification(Lang.noKeys)
+                                    ShowNotificationToPlayer(xPlayer, Lang.noKeys, "error")
                                 end
                             end)
                         end
@@ -170,7 +189,7 @@ function CheckVehicleKeyPermission(xPlayer, plate)
         ['@identifier'] = xPlayer.identifier
     })
     if directKey[1] then return true end
-    if Config and Config.lfRental == true then
+    if Config and Config.lfLocation == true then
         local locationVeh = MySQL.Sync.fetchAll("SELECT 1 FROM rented_vehicles WHERE identifier = @identifier AND plate = @plate", {
             ['@plate'] = plate,
             ['@identifier'] = xPlayer.identifier
@@ -182,7 +201,7 @@ function CheckVehicleKeyPermission(xPlayer, plate)
             ["@identifier"] = xPlayer.identifier
         })
         if crew[1] and crew[1].id_crew and crew[1].key_vehicle == 1 then
-            local crewVeh = MySQL.Sync.fetchAll("SELECT 1 FROM crew_vehicles WHERE plate = @plate AND crew = @crew", {
+            local crewVeh = MySQL.Sync.fetchAll("SELECT 1 FROM owned_vehicles WHERE plate = @plate AND crew = @crew", {
                 ['@plate'] = plate,
                 ['@crew'] = crew[1].id_crew
             })
